@@ -200,7 +200,6 @@ class CapitalWithdrawalActions
         $timer_start = microtime(true);
 
         try {
-            $capitalWithdrawal->branch_id = $data['branch_id'];
             $capitalWithdrawal->code = $this->generateUniqueCode($capitalWithdrawal->company_id, $data['code'], $capitalWithdrawal->id);
             $capitalWithdrawal->date = $data['date'];
             $capitalWithdrawal->investor_id = $data['investor_id'];

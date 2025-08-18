@@ -142,10 +142,20 @@ class NonCapitalAdditionRequest extends FormRequest
                 $this->merge([]);
                 break;
             case 'store':
+                $this->merge([
+                    'company_id' => $this->has('company_id') && $this->company_id ? HashidsHelper::decodeId($this->company_id) : null,
+                    'branch_id' => $this->has('branch_id') && $this->branch_id ? HashidsHelper::decodeId($this->branch_id) : null,
+                    'category_id' => $this->has('category_id') && $this->category_id ? HashidsHelper::decodeId($this->category_id) : null,
+                    'cash_account_id' => $this->has('cash_account_id') && $this->cash_account_id ? HashidsHelper::decodeId($this->cash_account_id) : null,
+                    'remarks' => $this->has('remarks') ? $this['remarks'] : null,
+                ]);
+                break;
             case 'update':
                 $this->merge([
-                    'company_id' => $this->has('company_id') ? HashidsHelper::decodeId($this->company_id) : null,
-                    'branch_id' => $this->has('branch_id') ? HashidsHelper::decodeId($this->branch_id) : null,
+                    'company_id' => $this->has('company_id') && $this->company_id ? HashidsHelper::decodeId($this->company_id) : null,
+                    'branch_id' => $this->has('branch_id') && $this->branch_id ? HashidsHelper::decodeId($this->branch_id) : null,
+                    'category_id' => $this->has('category_id') && $this->category_id ? HashidsHelper::decodeId($this->category_id) : null,
+                    'cash_account_id' => $this->has('cash_account_id') && $this->cash_account_id ? HashidsHelper::decodeId($this->cash_account_id) : null,
                     'remarks' => $this->has('remarks') ? $this['remarks'] : null,
                 ]);
                 break;

@@ -13,11 +13,11 @@ return new class extends Migration
             $table->ulid();
 
             $table->foreignId('company_id')->references('id')->on('companies');
-            $table->foreignId('branch_id')->references('id')->on('companies');
+            $table->foreignId('branch_id')->references('id')->on('branches');
             $table->string('code');
             $table->dateTime('date');
-            $table->foreignId('investor_id')->references('id')->on('companies');
-            $table->foreignId('cash_account_id')->references('id')->on('companies');
+            $table->foreignId('investor_id')->references('id')->on('investors');
+            $table->foreignId('cash_account_id')->references('id')->on('cash_accounts');
             $table->decimal('amount', 30, 8)->default(0);
             $table->string('remarks')->nullable();
 
