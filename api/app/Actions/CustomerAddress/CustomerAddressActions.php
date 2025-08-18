@@ -76,7 +76,7 @@ class CustomerAddressActions
             });
 
         $query->orderBy('companies.name', 'asc')
-            ->orderBy('customer_addresses.address', 'asc');
+            ->orderBy('customer_addresses.remarks', 'asc');
 
         if ($limit) {
             $query->limit($limit);

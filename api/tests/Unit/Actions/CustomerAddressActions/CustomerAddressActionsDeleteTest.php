@@ -24,15 +24,20 @@ class CustomerAddressActionsDeleteTest extends ActionsTestCase
     {
         $user = User::factory()
             ->has(Company::factory()->setStatusActive()->setIsDefault()
-                ->has(Customer::factory(), 'customers'))
+                ->has(
+                    CustomerAddress::factory()->state(function (array $attributes, Company $company) {
+                        $customer = Customer::factory()->for($company)->create();
+
+                        return [
+                            'customer_id' => $customer->id,
+                        ];
+                    })
+                )
+            )
             ->create();
 
-        $company = $user->companies()->inRandomOrder()->first();
-        $customer = $company->customers()->inRandomOrder()->first();
-
-        $customerAddress = CustomerAddress::factory()
-            ->for($customer, 'customer')
-            ->create();
+        $customerAddress = $user->companies()->inRandomOrder()->first()
+            ->customerAddresses()->inRandomOrder()->first();
         $result = $this->customerAddressActions->delete($customerAddress);
 
         $this->assertIsBool($result);

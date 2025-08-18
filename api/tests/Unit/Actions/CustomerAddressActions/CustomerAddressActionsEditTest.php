@@ -4,6 +4,7 @@ namespace Tests\Unit\Actions\CustomerAddressActions;
 
 use App\Actions\CustomerAddress\CustomerAddressActions;
 use App\Models\Company;
+use App\Models\Customer;
 use App\Models\CustomerAddress;
 use App\Models\User;
 use Exception;
@@ -24,13 +25,23 @@ class CustomerAddressActionsEditTest extends ActionsTestCase
     {
         $user = User::factory()
             ->has(Company::factory()->setStatusActive()->setIsDefault()
-                ->has(CustomerAddress::factory())
-            )->create();
+                ->has(
+                    CustomerAddress::factory()->state(function (array $attributes, Company $company) {
+                        $customer = Customer::factory()->for($company)->create();
+
+                        return [
+                            'customer_id' => $customer->id,
+                        ];
+                    })
+                )
+            )
+            ->create();
 
         $company = $user->companies()->inRandomOrder()->first();
         $customerAddress = $company->customerAddresses()->inRandomOrder()->first();
 
         $customerAddressArr = CustomerAddress::factory()->make()->toArray();
+        $customerAddressArr['customer_id'] = $customerAddress->customer_id;
 
         $result = $this->customerAddressActions->update($customerAddress, $customerAddressArr);
 
@@ -38,8 +49,12 @@ class CustomerAddressActionsEditTest extends ActionsTestCase
         $this->assertDatabaseHas('customer_addresses', [
             'id' => $customerAddress->id,
             'company_id' => $customerAddress->company_id,
-            'code' => $customerAddressArr['code'],
-            'name' => $customerAddressArr['name'],
+            'customer_id' => $customerAddressArr['customer_id'],
+            'address' => $customerAddressArr['address'],
+            'city' => $customerAddressArr['city'],
+            'contact' => $customerAddressArr['contact'],
+            'is_main' => $customerAddressArr['is_main'],
+            'remarks' => $customerAddressArr['remarks'],
         ]);
     }
 

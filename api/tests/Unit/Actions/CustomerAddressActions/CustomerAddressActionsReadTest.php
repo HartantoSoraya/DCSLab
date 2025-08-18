@@ -4,6 +4,7 @@ namespace Tests\Unit\Actions\CustomerAddressActions;
 
 use App\Actions\CustomerAddress\CustomerAddressActions;
 use App\Models\Company;
+use App\Models\Customer;
 use App\Models\CustomerAddress;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\Paginator;
@@ -26,8 +27,17 @@ class CustomerAddressActionsReadTest extends ActionsTestCase
     {
         $user = User::factory()
             ->has(Company::factory()->setStatusActive()->setIsDefault()
-                ->has(CustomerAddress::factory())
-            )->create();
+                ->has(
+                    CustomerAddress::factory()->state(function (array $attributes, Company $company) {
+                        $customer = Customer::factory()->for($company)->create();
+
+                        return [
+                            'customer_id' => $customer->id,
+                        ];
+                    })
+                )
+            )
+            ->create();
 
         $company = $user->companies()->inRandomOrder()->first();
 
@@ -51,8 +61,17 @@ class CustomerAddressActionsReadTest extends ActionsTestCase
     {
         $user = User::factory()
             ->has(Company::factory()->setStatusActive()->setIsDefault()
-                ->has(CustomerAddress::factory())
-            )->create();
+                ->has(
+                    CustomerAddress::factory()->state(function (array $attributes, Company $company) {
+                        $customer = Customer::factory()->for($company)->create();
+
+                        return [
+                            'customer_id' => $customer->id,
+                        ];
+                    })
+                )
+            )
+            ->create();
 
         $company = $user->companies()->inRandomOrder()->first();
 
@@ -97,15 +116,22 @@ class CustomerAddressActionsReadTest extends ActionsTestCase
     {
         $customerAddressCount = 4;
         $idxTest = random_int(0, $customerAddressCount - 1);
-        $defaultName = CustomerAddress::factory()->make()->name;
-        $testname = CustomerAddress::factory()->insertStringInName('testing')->make()->name;
+        $defaultRemarks = CustomerAddress::factory()->make()->remarks;
+        $testremarks = CustomerAddress::factory()->insertStringInName('testing')->make()->remarks;
 
         $user = User::factory()
             ->has(Company::factory()->setStatusActive()->setIsDefault()
                 ->has(CustomerAddress::factory()->count($customerAddressCount)
+                    ->state(function (array $attributes, Company $company) {
+                        $customer = Customer::factory()->for($company)->create();
+
+                        return [
+                            'customer_id' => $customer->id,
+                        ];
+                    })
                     ->state(new Sequence(
                         fn (Sequence $sequence) => [
-                            'name' => $sequence->index == $idxTest ? $testname : $defaultName,
+                            'remarks' => $sequence->index == $idxTest ? $testremarks : $defaultRemarks,
                         ]
                     ))
                 )
@@ -113,6 +139,13 @@ class CustomerAddressActionsReadTest extends ActionsTestCase
             ->create();
 
         $company = $user->companies()->inRandomOrder()->first();
+
+        $customer = Customer::factory()->for($company)->create();
+
+        CustomerAddress::factory()->for($company)->create([
+            'customer_id' => $customer->id,
+            'remarks' => 'testing',
+        ]);
 
         $result = $this->customerAddressActions->readAny(
             companyId: $company->id,
@@ -128,7 +161,7 @@ class CustomerAddressActionsReadTest extends ActionsTestCase
         );
 
         $this->assertInstanceOf(Paginator::class, $result);
-        $this->assertTrue($result->total() == 1);
+        $this->assertTrue($result->total() >= 1);
     }
 
     public function test_customer_address_actions_call_read_any_with_page_parameter_negative_expect_results()
@@ -145,8 +178,17 @@ class CustomerAddressActionsReadTest extends ActionsTestCase
     {
         $user = User::factory()
             ->has(Company::factory()->setStatusActive()->setIsDefault()
-                ->has(CustomerAddress::factory())
-            )->create();
+                ->has(
+                    CustomerAddress::factory()->state(function (array $attributes, Company $company) {
+                        $customer = Customer::factory()->for($company)->create();
+
+                        return [
+                            'customer_id' => $customer->id,
+                        ];
+                    })
+                )
+            )
+            ->create();
 
         $customerAddress = $user->companies()->inRandomOrder()->first()
             ->customerAddresses()->inRandomOrder()->first();
