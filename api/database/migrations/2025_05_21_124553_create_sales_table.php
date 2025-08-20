@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('branch_id')->references('id')->on('branches');
             $table->string('code');
             $table->date('date');
-            $table->date('due_days');
+            $table->integer('due_days');
             $table->foreignId('warehouse_id')->references('id')->on('warehouses');
             $table->foreignId('customer_id')->references('id')->on('customers');
             $table->foreignId('sales_order_id')->references('id')->on('sales_orders');

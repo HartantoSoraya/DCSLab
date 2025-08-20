@@ -21,6 +21,7 @@ class Sale extends Model
         'due_days',
         'warehouse_id',
         'customer_id',
+        'sales_order_id',
         'delivery_note_reference',
 
         'tax_invoice_number',
@@ -53,7 +54,6 @@ class Sale extends Model
         'amount_paid_on_invoice',
         'amount_paid_after_invoice',
         'amount_paid_total',
-        'amount_due',
 
         'is_paid_off',
         'is_valid',
@@ -107,6 +107,11 @@ class Sale extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function salesOrder()
+    {
+        return $this->belongsTo(SalesOrder::class);
     }
 
     public function saleProductUnits()

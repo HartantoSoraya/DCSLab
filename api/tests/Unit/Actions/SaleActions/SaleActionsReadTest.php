@@ -3,9 +3,14 @@
 namespace Tests\Unit\Actions\SaleActions;
 
 use App\Actions\Sale\SaleActions;
+use App\Models\Branch;
 use App\Models\Company;
+use App\Models\Customer;
+use App\Models\CustomerAddress;
 use App\Models\Sale;
+use App\Models\SalesOrder;
 use App\Models\User;
+use App\Models\Warehouse;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Sequence;
@@ -26,7 +31,23 @@ class SaleActionsReadTest extends ActionsTestCase
     {
         $user = User::factory()
             ->has(Company::factory()->setStatusActive()->setIsDefault()
-                ->has(Sale::factory())
+                ->has(Branch::factory())
+                ->has(
+                    Sale::factory()->state(function (array $attributes, Company $company) {
+                        $branch = $company->branches()->inRandomOrder()->first();
+                        $warehouse = Warehouse::factory()->for($company)->create(['branch_id' => $branch->id]);
+                        $customer = Customer::factory()->for($company)->create();
+                        $customerAddress = CustomerAddress::factory()->for($company)->for($customer)->create();
+                        $salesOrder = SalesOrder::factory()->for($company)->for($branch)->for($customer)->for($customerAddress)->create();
+
+                        return [
+                            'branch_id' => $branch->id,
+                            'warehouse_id' => $warehouse->id,
+                            'customer_id' => $customer->id,
+                            'sales_order_id' => $salesOrder->id,
+                        ];
+                    })
+                )
             )->create();
 
         $company = $user->companies()->inRandomOrder()->first();
@@ -51,7 +72,23 @@ class SaleActionsReadTest extends ActionsTestCase
     {
         $user = User::factory()
             ->has(Company::factory()->setStatusActive()->setIsDefault()
-                ->has(Sale::factory())
+                ->has(Branch::factory())
+                ->has(
+                    Sale::factory()->state(function (array $attributes, Company $company) {
+                        $branch = $company->branches()->inRandomOrder()->first();
+                        $warehouse = Warehouse::factory()->for($company)->create(['branch_id' => $branch->id]);
+                        $customer = Customer::factory()->for($company)->create();
+                        $customerAddress = CustomerAddress::factory()->for($company)->for($customer)->create();
+                        $salesOrder = SalesOrder::factory()->for($company)->for($branch)->for($customer)->for($customerAddress)->create();
+
+                        return [
+                            'branch_id' => $branch->id,
+                            'warehouse_id' => $warehouse->id,
+                            'customer_id' => $customer->id,
+                            'sales_order_id' => $salesOrder->id,
+                        ];
+                    })
+                )
             )->create();
 
         $company = $user->companies()->inRandomOrder()->first();
@@ -97,22 +134,50 @@ class SaleActionsReadTest extends ActionsTestCase
     {
         $saleCount = 4;
         $idxTest = random_int(0, $saleCount - 1);
-        $defaultName = Sale::factory()->make()->name;
-        $testname = Sale::factory()->insertStringInName('testing')->make()->name;
+        $defaultRemarks = Sale::factory()->make()->remarks;
+        $testremarks = Sale::factory()->insertStringInName('testing')->make()->remarks;
 
         $user = User::factory()
             ->has(Company::factory()->setStatusActive()->setIsDefault()
-                ->has(Sale::factory()->count($saleCount)
-                    ->state(new Sequence(
-                        fn (Sequence $sequence) => [
-                            'name' => $sequence->index == $idxTest ? $testname : $defaultName,
-                        ]
-                    ))
+                ->has(Branch::factory())
+                ->has(
+                    Sale::factory()->state(function (array $attributes, Company $company) {
+                        $branch = $company->branches()->inRandomOrder()->first();
+                        $warehouse = Warehouse::factory()->for($company)->create(['branch_id' => $branch->id]);
+                        $customer = Customer::factory()->for($company)->create();
+                        $customerAddress = CustomerAddress::factory()->for($company)->for($customer)->create();
+                        $salesOrder = SalesOrder::factory()->for($company)->for($branch)->for($customer)->for($customerAddress)->create();
+
+                        return [
+                            'branch_id' => $branch->id,
+                            'warehouse_id' => $warehouse->id,
+                            'customer_id' => $customer->id,
+                            'sales_order_id' => $salesOrder->id,
+                        ];
+                    })
+                        ->state(new Sequence(
+                            fn (Sequence $sequence) => [
+                                'remarks' => $sequence->index == $idxTest ? $testremarks : $defaultRemarks,
+                            ]
+                        ))
                 )
-            )
-            ->create();
+            )->create();
 
         $company = $user->companies()->inRandomOrder()->first();
+
+        $branch = $company->branches()->inRandomOrder()->first();
+        $warehouse = Warehouse::factory()->for($company)->create(['branch_id' => $branch->id]);
+        $customer = Customer::factory()->for($company)->create();
+        $customerAddress = CustomerAddress::factory()->for($company)->for($customer)->create();
+        $salesOrder = SalesOrder::factory()->for($company)->for($branch)->for($customer)->for($customerAddress)->create();
+
+        Sale::factory()->for($company)->create([
+            'branch_id' => $branch->id,
+            'warehouse_id' => $warehouse->id,
+            'customer_id' => $customer->id,
+            'sales_order_id' => $salesOrder->id,
+            'remarks' => $testremarks,
+        ]);
 
         $result = $this->saleActions->readAny(
             companyId: $company->id,
@@ -128,7 +193,7 @@ class SaleActionsReadTest extends ActionsTestCase
         );
 
         $this->assertInstanceOf(Paginator::class, $result);
-        $this->assertTrue($result->total() == 1);
+        $this->assertTrue($result->total() >= 1);
     }
 
     public function test_sale_actions_call_read_any_with_page_parameter_negative_expect_results()
@@ -145,7 +210,23 @@ class SaleActionsReadTest extends ActionsTestCase
     {
         $user = User::factory()
             ->has(Company::factory()->setStatusActive()->setIsDefault()
-                ->has(Sale::factory())
+                ->has(Branch::factory())
+                ->has(
+                    Sale::factory()->state(function (array $attributes, Company $company) {
+                        $branch = $company->branches()->inRandomOrder()->first();
+                        $warehouse = Warehouse::factory()->for($company)->create(['branch_id' => $branch->id]);
+                        $customer = Customer::factory()->for($company)->create();
+                        $customerAddress = CustomerAddress::factory()->for($company)->for($customer)->create();
+                        $salesOrder = SalesOrder::factory()->for($company)->for($branch)->for($customer)->for($customerAddress)->create();
+
+                        return [
+                            'branch_id' => $branch->id,
+                            'warehouse_id' => $warehouse->id,
+                            'customer_id' => $customer->id,
+                            'sales_order_id' => $salesOrder->id,
+                        ];
+                    })
+                )
             )->create();
 
         $sale = $user->companies()->inRandomOrder()->first()

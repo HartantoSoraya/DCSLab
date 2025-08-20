@@ -20,6 +20,7 @@ class SaleResource extends JsonResource
             'due_days' => $this->due_days,
             'warehouse_id' => new WarehouseResource($this->warehouse),
             'customer_id' => new CustomerResource($this->customer),
+            'sales_order_id' => new SalesOrderResource($this->salesOrder),
             'delivery_note_reference' => $this->delivery_note_reference,
 
             'tax_invoice_number' => $this->tax_invoice_number,

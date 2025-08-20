@@ -14,7 +14,7 @@ class SalesOrderFactory extends Factory
             'shipping_date' => fake()->date(),
             'remarks' => fake()->sentence(),
             'is_has_invoice' => fake()->boolean(),
-            'is_received' => fake()->boolean(),
+            'is_sent' => fake()->boolean(),
             'total' => fake()->numberBetween(10000, 1000000),
             'global_discount_rate' => fake()->numberBetween(0, 100),
             'global_discount_fixed' => fake()->numberBetween(0, 100),

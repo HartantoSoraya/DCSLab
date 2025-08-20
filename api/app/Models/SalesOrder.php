@@ -71,6 +71,11 @@ class SalesOrder extends Model
         return $this->belongsTo(CustomerAddress::class);
     }
 
+    public function sale()
+    {
+        return $this->hasMany(Sale::class);
+    }
+
     public function saleOrderProductUnits()
     {
         return $this->hasMany(SaleOrderProductUnit::class);

@@ -8,6 +8,7 @@ use App\Models\Sale;
 use App\Rules\IsValidBranch;
 use App\Rules\IsValidCompany;
 use App\Rules\IsValidCustomer;
+use App\Rules\IsValidSaleOrder;
 use App\Rules\IsValidWarehouse;
 use App\Rules\SaleStoreValidCode;
 use App\Rules\SaleUpdateValidCode;
@@ -77,6 +78,7 @@ class SaleRequest extends FormRequest
                     'due_days' => ['required', 'integer', 'min:1'],
                     'warehouse_id' => ['required', 'integer', 'bail', new IsValidWarehouse($this->company_id, true)],
                     'customer_id' => ['required', 'integer', 'bail', new IsValidCustomer($this->company_id)],
+                    'sales_order_id' => ['nullable', 'integer', new IsValidSaleOrder($this->company_id)],
                     'delivery_note_reference' => ['nullable', 'string', 'max:255'],
 
                     'tax_invoice_number' => ['nullable', 'string', 'max:255'],
@@ -123,6 +125,7 @@ class SaleRequest extends FormRequest
                     'due_days' => ['required', 'integer', 'min:1'],
                     'warehouse_id' => ['required', 'integer', 'bail', new IsValidWarehouse($this->company_id, true)],
                     'customer_id' => ['required', 'integer', 'bail', new IsValidCustomer($this->company_id)],
+                    'sales_order_id' => ['nullable', 'integer', new IsValidSaleOrder($this->company_id)],
                     'delivery_note_reference' => ['nullable', 'string', 'max:255'],
 
                     'tax_invoice_number' => ['nullable', 'string', 'max:255'],

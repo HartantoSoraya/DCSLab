@@ -34,6 +34,7 @@ class SaleActions
             $sale->due_days = $data['due_days'];
             $sale->warehouse_id = $data['warehouse_id'];
             $sale->customer_id = $data['customer_id'];
+            $sale->sales_order_id = $data['sales_order_id'];
             $sale->delivery_note_reference = $data['delivery_note_reference'];
 
             $sale->tax_invoice_number = $data['tax_invoice_number'];
@@ -113,7 +114,7 @@ class SaleActions
             });
 
         $query->orderBy('companies.name', 'asc')
-            ->orderBy('sales.date', 'dsc');
+            ->orderBy('sales.remarks', 'asc');
 
         if ($limit) {
             $query->limit($limit);
@@ -181,7 +182,7 @@ class SaleActions
 
     public function read(Sale $sale): Sale
     {
-        return $sale->load('company')->first();
+        return $sale->load('company', 'branch', 'customer', 'salesOrder')->first();
     }
 
     public function getAllActiveSale(
@@ -240,6 +241,7 @@ class SaleActions
             $sale->due_days = $data['due_days'];
             $sale->warehouse_id = $data['warehouse_id'];
             $sale->customer_id = $data['customer_id'];
+            $sale->sales_order_id = $data['sales_order_id'];
             $sale->delivery_note_reference = $data['delivery_note_reference'];
 
             $sale->tax_invoice_number = $data['tax_invoice_number'];
